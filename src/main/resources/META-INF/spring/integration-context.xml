@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<int:poller default="true" fixed-rate="10000"/>
+
+	<int:channel id="files"/>
+
+	<int:channel id="requests"/>
+
+	<int:channel id="statuses">
+		<int:queue capacity="10"/>
+	</int:channel>
+
+	<int-file:inbound-channel-adapter
+		directory="classpath:/data/paymentImport"
+		channel="files"/>
+
+	<int:transformer input-channel="files" output-channel="requests">
+		<bean class="org.springframework.batch.integration.samples.payments.FileMessageToJobRequest">
+			<property name="job" ref="importPayments"/>
+			<property name="fileParameterName" value="input.file.name"/>
+		</bean>
+	</int:transformer>
+
+	<int:service-activator method="launch" input-channel="requests"
+		output-channel="statuses">
+		<bean class="org.springframework.batch.integration.launch.JobLaunchingMessageHandler">
+			<constructor-arg ref="jobLauncher"/>
+		</bean>
+	</int:service-activator>
+
+	<int:channel id="jobExecutions"/>
+
+	<int:channel id="chunks"/>
+
+	<int:channel id="jobRestarts">
+		<int:queue capacity="10"/>
+	</int:channel>
+
+	<int:channel id="mailNotifications"/>
+
+	<int:channel id="notifiableExecutions"/>
+
+	<int:channel id="chunkExecutions"/>
+
+	<int:gateway id="notificationExecutionsListener"
+		service-interface="org.springframework.batch.core.JobExecutionListener"
+		default-request-channel="jobExecutions"/>
+
+	<int:router id="executionsRouter" input-channel="jobExecutions">
+		<bean class="org.springframework.batch.integration.samples.payments.JobExecutionsRouter"/>
+	</int:router>
+
+	<int:chain input-channel="jobRestarts">
+		<int:delayer id="foo" default-delay="10000"/>
+		<int:service-activator>
+			<bean class="org.springframework.batch.integration.samples.payments.JobRestart"/>
+		</int:service-activator>
+	</int:chain>
+
+	<int:transformer id="mailBodyTransformer"
+		input-channel="notifiableExecutions"
+		output-channel="mailNotifications">
+		<bean class="org.springframework.batch.integration.samples.payments.ExecutionsToMailTransformer"/>
+	</int:transformer>
+
+	<int-mail:outbound-channel-adapter id="notificationsSender"
+					channel="mailNotifications" mail-sender="mailSender"/>
+
+	<bean id="mailSender" class="org.springframework.batch.integration.samples.payments.StubJavaMailSender">
+		<constructor-arg>
+			<bean class="javax.mail.internet.MimeMessage">
+				<constructor-arg type="javax.mail.Session"><null/></constructor-arg>
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<int-stream:stdout-channel-adapter channel="chunkExecutions"/>
+
+	<int:service-activator input-channel="chunks">
+		<bean class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
+			<property name="chunkProcessor">
+				<bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
+					<property name="itemWriter">
+						<bean class="org.springframework.batch.integration.samples.payments.PaymentWriter">
+							<constructor-arg ref="dataSource"/>
+						</bean>
+					</property>
+					<property name="itemProcessor">
+						<bean class="org.springframework.batch.item.support.PassThroughItemProcessor"/>
+					</property>
+				</bean>
+			</property>
+		</bean>
+	</int:service-activator>
+
+	<bean id="chunkItemWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter">
+		<property name="messagingOperations" >
+			<bean class="org.springframework.integration.core.MessagingTemplate">
+				<property name="defaultChannel" ref="chunks"/>
+			</bean>
+		</property>
+	</bean>
+
+</beans>
