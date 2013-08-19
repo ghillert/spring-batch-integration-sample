@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.integration.samples.payments;
+package org.springframework.batch.integration.samples.payments.model;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * @author Marius Bogoevici
+ * @author Gunnar Hillert
  */
 public class Payment {
 
@@ -43,6 +45,12 @@ public class Payment {
 		return date;
 	}
 
+	public String getDateFormatted() {
+		final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		return simpleDateFormat.format(date);
+	}
+
+
 	public void setDate(Date date) {
 		this.date = date;
 	}
@@ -65,9 +73,8 @@ public class Payment {
 
 	@Override
 	public String toString() {
-		return "Payment [sourceAccountNo=" + sourceAccountNo
-				+ ", destinationAccountNo=" + destinationAccountNo
-				+ ", amount=" + amount + ", date=" + date + "]";
+		return "Payment [sourceAcct#=" + sourceAccountNo
+				+ ", destAcct#=" + destinationAccountNo
+				+ ", amount=" + amount + ", date=" + getDateFormatted() + "]";
 	}
-
 }

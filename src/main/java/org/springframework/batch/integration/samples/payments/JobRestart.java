@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.integration.samples.payments;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -27,8 +29,12 @@ import org.springframework.integration.annotation.ServiceActivator;
 
 /**
  * @author Marius Bogoevici
+ * @author Gunnar Hillert
  */
 public class JobRestart {
+
+	private static final Log logger = LogFactory.getLog(JobRestart.class);
+
 	@Autowired
 	JobLauncher jobLauncher;
 
@@ -37,6 +43,7 @@ public class JobRestart {
 
 	@ServiceActivator
 	public void restartIfPossible(JobExecution execution) throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException {
-	   jobLauncher.run(job, execution.getJobParameters());
+		logger.info("Restarting job...");
+		jobLauncher.run(job, execution.getJobParameters());
 	}
 }

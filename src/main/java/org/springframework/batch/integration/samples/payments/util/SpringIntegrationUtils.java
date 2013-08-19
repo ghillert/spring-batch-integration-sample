@@ -32,8 +32,7 @@ import org.springframework.integration.file.FileWritingMessageHandler;
 /**
  * Displays the names of the input and output directories.
  *
- * @author gh
- * @since 1.0
+ * @author Gunnar Hillert
  *
  */
 public final class SpringIntegrationUtils {

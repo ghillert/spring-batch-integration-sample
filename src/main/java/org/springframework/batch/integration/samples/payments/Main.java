@@ -15,22 +15,17 @@
  */
 package org.springframework.batch.integration.samples.payments;
 
-import java.util.Scanner;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.samples.payments.util.SpringIntegrationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.integration.Message;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.jdbc.core.JdbcTemplate;
-
+import org.springframework.mail.SimpleMailMessage;
 
 /**
  * Starts the Spring Context and will initialize the Spring Integration routes.
@@ -40,16 +35,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public final class Main {
 
-	private static final Logger LOGGER = Logger.getLogger(Main.class);
-
 	private Main() { }
 
 	/**
 	 * Load the Spring Integration Application Context
 	 *
 	 * @param args - command line arguments
+	 * @throws InterruptedException
 	 */
-	public static void main(final String... args) {
+	public static void main(final String... args) throws InterruptedException {
 
 		System.out.println("\n========================================================="
 						+ "\n    Welcome to the Spring Batch Integration              "
@@ -67,13 +61,8 @@ public final class Main {
 		context.registerShutdownHook();
 
 		final JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
-		final QueueChannel statusesChannel = context.getBean("statuses", QueueChannel.class);
-		final JobRepository jobRepository = context.getBean(JobRepository.class);
 
 		SpringIntegrationUtils.displayDirectories(context);
-
-
-		final Scanner scanner = new Scanner(System.in);
 
 		System.out.println("\n========================================================="
 						+ "\n                                                         "
@@ -81,13 +70,30 @@ public final class Main {
 						+ "\n                                                         "
 						+ "\n=========================================================" );
 
-		JobExecution jobExecution = ((Message<JobExecution>) statusesChannel.receive(120000)).getPayload();
-		ExitStatus exitStatus = jobExecution.getExitStatus();
-		Assert.assertEquals(ExitStatus.COMPLETED, exitStatus);
-		int count = jdbcTemplate.queryForInt("select count(*) from payments");
+		final QueueChannel completeApplicationChannel =
+				context.getBean("completeApplication", QueueChannel.class);
 
-		System.out.println(String.format("\nDONE!!\nexitStatus: %s; imported # of payments: %s",
+		@SuppressWarnings("unchecked")
+		final Message<JobExecution> jobExecutionMessage = (Message<JobExecution>) completeApplicationChannel.receive();
+		final JobExecution jobExecution = jobExecutionMessage.getPayload();
+		final ExitStatus exitStatus = jobExecution.getExitStatus();
+		final int count = jdbcTemplate.queryForObject("select count(*) from payments", Integer.class);
+
+		System.out.println(String.format("\nDONE!!\nexitStatus: %s; # of payments imported: %s",
 				exitStatus.getExitCode(), count));
+
+		final StubJavaMailSender mailSender = context.getBean(StubJavaMailSender.class);
+		final List<SimpleMailMessage> emails = mailSender.getSentSimpleMailMessages();
+		final int numberOfSentNotifications = emails.size();
+
+		System.out.println(String.format("Sent '%s' notifications:", numberOfSentNotifications));
+
+		int counter = 1;
+		for (SimpleMailMessage mailMessage : emails) {
+			System.out.println(String.format("#%s Subject: '%s', Message: '%s'.",
+					counter, mailMessage.getText(), mailMessage.getText()));
+			counter++;
+		}
 
 		System.exit(0);
 

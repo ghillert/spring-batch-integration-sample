@@ -17,7 +17,12 @@ package org.springframework.batch.integration.samples.payments;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.listener.ItemListenerSupport;
+import org.springframework.batch.integration.samples.payments.model.Notification;
+import org.springframework.batch.integration.samples.payments.model.Payment;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.MessageChannel;
@@ -25,8 +30,11 @@ import org.springframework.integration.support.MessageBuilder;
 
 /**
  * @author Marius Bogoevici
+ * @author Gunnar Hillert
  */
 public class PaymentChunkListener extends ItemListenerSupport<Payment, Payment> {
+
+	private static final Log logger = LogFactory.getLog(PaymentChunkListener.class);
 
 	@Autowired
 	@Qualifier("chunkExecutions")
@@ -34,6 +42,10 @@ public class PaymentChunkListener extends ItemListenerSupport<Payment, Payment> 
 
 	@Override
 	public void onReadError(Exception ex) {
+		if (ex instanceof FlatFileParseException) {
+			FlatFileParseException ffpe = (FlatFileParseException) ex;
+			logger.error(String.format("Error reading data on line '%s' - data: '%s'", ffpe.getLineNumber(), ffpe.getInput()));
+		}
 		chunkNotificationsChannel.send(MessageBuilder.withPayload(new Notification(ex.getMessage(),true)).build());
 	}
 

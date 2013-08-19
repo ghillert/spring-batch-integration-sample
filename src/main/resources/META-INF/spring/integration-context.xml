@@ -45,13 +45,15 @@
 
 	<int:channel id="chunks"/>
 
-	<int:channel id="jobRestarts">
-		<int:queue capacity="10"/>
-	</int:channel>
+	<int:channel id="jobRestarts" />
 
 	<int:channel id="mailNotifications"/>
 
 	<int:channel id="notifiableExecutions"/>
+
+	<int:channel id="completeApplication">
+		<int:queue/>
+	</int:channel>
 
 	<int:channel id="chunkExecutions"/>
 
@@ -64,7 +66,7 @@
 	</int:router>
 
 	<int:chain input-channel="jobRestarts">
-		<int:delayer id="foo" default-delay="10000"/>
+		<int:delayer id="foo" default-delay="5000"/>
 		<int:service-activator>
 			<bean class="org.springframework.batch.integration.samples.payments.JobRestart"/>
 		</int:service-activator>
@@ -87,7 +89,7 @@
 		</constructor-arg>
 	</bean>
 
-	<int-stream:stdout-channel-adapter channel="chunkExecutions"/>
+	<int-stream:stdout-channel-adapter channel="chunkExecutions" auto-startup="true"/>
 
 	<int:service-activator input-channel="chunks">
 		<bean class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">

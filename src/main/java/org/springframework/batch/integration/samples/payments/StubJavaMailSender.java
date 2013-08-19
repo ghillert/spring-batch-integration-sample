@@ -38,7 +38,6 @@ public class StubJavaMailSender implements JavaMailSender {
 
 	private final List<SimpleMailMessage> sentSimpleMailMessages = new ArrayList<SimpleMailMessage>();
 
-
 	public StubJavaMailSender(MimeMessage uniqueMessage) {
 		this.uniqueMessage = uniqueMessage;
 	}
@@ -72,7 +71,7 @@ public class StubJavaMailSender implements JavaMailSender {
 	}
 
 	public void send(MimeMessagePreparator[] mimeMessagePreparators) throws MailException {
-	    throw new UnsupportedOperationException("MimeMessagePreparator not supported");
+		throw new UnsupportedOperationException("MimeMessagePreparator not supported");
 	}
 
 	public void send(SimpleMailMessage simpleMessage) throws MailException {

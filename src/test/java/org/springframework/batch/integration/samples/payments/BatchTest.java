@@ -54,7 +54,7 @@ public class BatchTest {
 		JobExecution jobExecution = ((Message<JobExecution>) statusesChannel.receive(120000)).getPayload();
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		Assert.assertEquals(ExitStatus.COMPLETED, exitStatus);
-		int count = jdbcTemplate.queryForInt("select count(*) from payments");
+		int count = jdbcTemplate.queryForObject("select count(*) from payments", Integer.class);
 		Assert.assertEquals(27, count);
 	}
 }

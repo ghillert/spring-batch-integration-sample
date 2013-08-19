@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.integration.samples.payments;
+package org.springframework.batch.integration.samples.payments.model;
 
 /**
  * @author Marius Bogoevici
+ * @author Gunnar Hillert
  */
 public class Notification {
+
 	private String message;
 
 	private boolean failure;
@@ -43,4 +45,11 @@ public class Notification {
 	public void setFailure(boolean failure) {
 		this.failure = failure;
 	}
+
+	@Override
+	public String toString() {
+		return "Notification [message=" + message + ", failure=" + failure
+				+ "]";
+	}
 }
+

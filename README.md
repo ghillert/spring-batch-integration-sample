@@ -11,7 +11,7 @@ The sample is based on the sample create for the book [Spring Integration in Act
 
 ## Objective
 
-This sample uses **Spring Batch Integration** to more easily use *Spring Batch* and *Spring Integration* together. The application will poll a directory for a file that contains 27 payment records. *Spring Batch* will subsequently process those payments.
+This sample uses **Spring Batch Integration** to more easily use *Spring Batch* and *Spring Integration* together. The application will poll a directory for a file that contains 27 payment records. *Spring Batch* will subsequently process those payments. If an error occurs the Job is resubmitted.
 
 ## Running the Sample
 
@@ -30,5 +30,8 @@ Or via one line:
 As a result the final console output should be:
 
 	DONE!!
-	exitStatus: COMPLETED; imported # of payments: 27
-	
+	exitStatus: COMPLETED; # of payments imported: 27
+	Sent '2' notifications:
+	#1 Subject: 'Execution has STARTED', Message: 'Execution has STARTED'.
+	#2 Subject: 'Execution has COMPLETED', Message: 'Execution has COMPLETED'.
+
