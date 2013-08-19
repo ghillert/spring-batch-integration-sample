@@ -234,5 +234,10 @@
 			<name>SpringSource Maven Milestone Repository</name>
 			<url>https://repo.springsource.org/libs-milestone</url>
 		</repository>
+		<repository>
+			<id>spring-snapshot</id>
+			<name>Spring Maven SNAPSHOT Repository</name>
+			<url>http://repo.springsource.org/libs-snapshot</url>
+		</repository>
 	</repositories>
 </project>
