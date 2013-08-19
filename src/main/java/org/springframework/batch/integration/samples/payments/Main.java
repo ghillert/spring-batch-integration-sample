@@ -15,16 +15,12 @@
  */
 package org.springframework.batch.integration.samples.payments;
 
-import java.util.Scanner;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.samples.payments.util.SpringIntegrationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.integration.Message;
@@ -68,24 +64,21 @@ public final class Main {
 
 		final JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
 		final QueueChannel statusesChannel = context.getBean("statuses", QueueChannel.class);
-		final JobRepository jobRepository = context.getBean(JobRepository.class);
-
 		SpringIntegrationUtils.displayDirectories(context);
 
-
-		final Scanner scanner = new Scanner(System.in);
-
-		System.out.println("\n========================================================="
+		System.out
+				.println("\n========================================================="
 						+ "\n                                                         "
 						+ "\n    Waiting for Job execution to finish.                 "
 						+ "\n                                                         "
 						+ "\n=========================================================" );
 
+		@SuppressWarnings("unchecked")
 		JobExecution jobExecution = ((Message<JobExecution>) statusesChannel.receive(120000)).getPayload();
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		Assert.assertEquals(ExitStatus.COMPLETED, exitStatus);
-		int count = jdbcTemplate.queryForInt("select count(*) from payments");
-
+		int count = jdbcTemplate.queryForObject(
+				"select count(*) from payments", Integer.class).intValue();
 		System.out.println(String.format("\nDONE!!\nexitStatus: %s; imported # of payments: %s",
 				exitStatus.getExitCode(), count));
 
