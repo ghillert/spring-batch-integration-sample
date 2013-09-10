@@ -20,5 +20,7 @@ In order to illustrate the various concurrent processing techniques, we provide 
 * Batch Integration - Payment Import
 * Batch Integration - Payment Import using Concurrent Step
 * Batch Integration - Payment Import using Async Processor and Writer
-
+  - without Spring Integration
+  - with Spring Integration
+* Batch Integration - Payment Import with Remote Chunking
 

@@ -20,7 +20,7 @@
 	</logger>
 
 	<logger name="org.springframework.batch.integration">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.springframework.batch.integration.samples.payments">
