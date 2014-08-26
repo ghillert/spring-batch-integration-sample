@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ import java.io.File;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.integration.launch.JobLaunchRequest;
-import org.springframework.integration.Message;
 import org.springframework.integration.annotation.Transformer;
+import org.springframework.messaging.Message;
 
 /**
  * @author Marius Bogoevici
+ * @author Gunnar Hillert
  */
 public class FileMessageToJobRequest {
 
