@@ -24,10 +24,6 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<context:annotation-config/>
-
-	<bean class="org.springframework.batch.integration.samples.payments.config.CommonConfig"/>
-
 	<batch:job id="importPayments">
 		<batch:step id="loadPayments">
 			<batch:tasklet>

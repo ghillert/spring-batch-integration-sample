@@ -7,7 +7,7 @@
 	<artifactId>payment-import-root</artifactId>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<name>Spring Batch Integration Samples Root</name>
-	<url>http://www.springsource.org/spring-integration</url>
+	<url>https://github.com/ghillert/spring-batch-integration-sample</url>
 	<packaging>pom</packaging>
 
 	<prerequisites>

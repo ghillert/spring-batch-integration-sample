@@ -19,13 +19,16 @@ import java.util.List;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.integration.samples.payments.config.CommonConfig;
 import org.springframework.batch.integration.samples.payments.util.SpringIntegrationUtils;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.messaging.Message;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.messaging.Message;
 
 /**
  * Starts the Spring Context and will initialize the Spring Integration routes.
@@ -50,15 +53,11 @@ public final class Main {
 						+ "\n          Payments Import Sample                         "
 						+ "\n                                                         "
 						+ "\n    For more information please visit:                   "
-						+ "\n    http://www.springsource.org/spring-integration       "
+						+ "\n    http://www.spring.io/spring-batch                    "
 						+ "\n                                                         "
 						+ "\n=========================================================" );
 
-		final AbstractApplicationContext context =
-				new ClassPathXmlApplicationContext("classpath:META-INF/spring/batch-context.xml",
-						"classpath:META-INF/spring/integration-context.xml");
-
-		context.registerShutdownHook();
+		final ConfigurableApplicationContext context = SpringApplication.run(CommonConfig.class);
 
 		final JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
 

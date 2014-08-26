@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -30,6 +31,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  */
 @Configuration
 @EnableBatchProcessing
+@ImportResource({
+	"classpath:META-INF/spring/batch-context.xml",
+	"classpath:META-INF/spring/integration-context.xml"})
 public class CommonConfig {
 
 	@Bean

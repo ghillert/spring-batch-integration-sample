@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.integration.samples.payments.config.CommonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.Message;
@@ -34,8 +35,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Gunnar Hillert
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:META-INF/spring/batch-context.xml",
-					"classpath:META-INF/spring/integration-context.xml"})
+@ContextConfiguration(classes=CommonConfig.class)
 public class BatchTest {
 
 	@Autowired

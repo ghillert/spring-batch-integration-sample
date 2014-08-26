@@ -167,14 +167,9 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>repo.springsource.org.milestone</id>
-			<name>SpringSource Maven Milestone Repository</name>
-			<url>https://repo.springsource.org/libs-milestone</url>
-		</repository>
-		<repository>
-			<id>spring-snapshot</id>
-			<name>Spring Maven SNAPSHOT Repository</name>
-			<url>http://repo.springsource.org/libs-snapshot</url>
+			<id>repo.spring.io.milestone</id>
+			<name>Spring Maven Milestone Repository</name>
+			<url>https://repo.spring.io/libs-milestone</url>
 		</repository>
 	</repositories>
 </project>

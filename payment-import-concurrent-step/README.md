@@ -1,13 +1,13 @@
 Spring Batch Integration Sample
 ===============================
 
-This is a sample for the [Spring Batch Integration][] project.
+This is a sample for the [Spring Batch Integration][] module.
 
-[Spring Batch Integration]: https://github.com/SpringSource/spring-batch-admin/tree/master/spring-batch-integration
+[Spring Batch Integration]: https://github.com/spring-projects/spring-batch/tree/master/spring-batch-integration
 
 The sample is based on the sample create for the book [Spring Integration in Action](http://www.amazon.com/Spring-Integration-Action-Mark-Fisher/dp/1935182439/). You can find that sample at:
 
-* https://github.com/SpringSource/Spring-Integration-in-Action/tree/master/siia-examples/batch
+* https://github.com/spring-projects/Spring-Integration-in-Action/tree/master/siia-examples/batch
 
 ## Objective
 

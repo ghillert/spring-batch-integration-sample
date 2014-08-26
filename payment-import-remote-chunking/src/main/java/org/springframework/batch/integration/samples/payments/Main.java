@@ -50,7 +50,7 @@ public final class Main {
 						+ "\n          Payments Import Sample                         "
 						+ "\n                                                         "
 						+ "\n    For more information please visit:                   "
-						+ "\n    http://www.springsource.org/spring-integration       "
+						+ "\n    http://www.spring.io/spring-batch                    "
 						+ "\n                                                         "
 						+ "\n=========================================================" );
 
