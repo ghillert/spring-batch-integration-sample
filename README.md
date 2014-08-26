@@ -1,6 +1,8 @@
 Spring Batch Integration Samples
 ================================
 
+[![Build Status](https://travis-ci.org/ghillert/spring-batch-integration-sample.svg)](https://travis-ci.org/ghillert/spring-batch-integration-sample)
+
 This project contains samples for the [Spring Batch Integration][] module.
 
 [Spring Batch Integration]: https://github.com/spring-projects/spring-batch/tree/master/spring-batch-integration
