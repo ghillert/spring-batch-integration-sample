@@ -23,8 +23,6 @@ import org.springframework.batch.integration.samples.payments.config.CommonConfi
 import org.springframework.batch.integration.samples.payments.util.SpringIntegrationUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.SimpleMailMessage;
