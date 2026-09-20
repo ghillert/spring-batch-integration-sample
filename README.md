@@ -26,3 +26,14 @@ In order to illustrate the various concurrent processing techniques, we provide 
   - with Spring Integration
 * Batch Integration - Payment Import with Remote Chunking
 
+## Building and Testing
+
+Use JDK 17 or later and run `mvn clean package` from the project root.
+This runs five tests across the four sample modules, including both async
+processor variants.
+
+The samples still use Spring Framework 4 and Spring Batch 3. Their CGLIB and
+XStream dependencies require reflective access to JDK internals, so each module
+configures the necessary `--add-opens` options for the Surefire test JVM. These
+options apply only to Maven tests; running a sample directly requires the same
+JVM options from its POM.
