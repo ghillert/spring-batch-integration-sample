@@ -5,13 +5,11 @@
 	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
 	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
 		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<int:poller default="true" fixed-rate="10000"/>
 
@@ -38,13 +36,14 @@
 	<int:service-activator method="launch" input-channel="requests"
 		output-channel="statuses">
 		<bean class="org.springframework.batch.integration.launch.JobLaunchingMessageHandler">
-			<constructor-arg ref="jobLauncher"/>
+			<constructor-arg ref="jobOperator"/>
 		</bean>
 	</int:service-activator>
 
 	<int:gateway id="notificationExecutionsListener"
-		service-interface="org.springframework.batch.core.JobExecutionListener"
-		default-request-channel="jobExecutions"/>
+		service-interface="org.springframework.batch.core.listener.JobExecutionListener"
+		default-request-channel="jobExecutions"
+		proxy-default-methods="true"/>
 
 	<int:channel id="jobExecutions"/>
 
@@ -74,10 +73,13 @@
 	<int-mail:outbound-channel-adapter id="notificationsSender"
 					channel="mailNotifications" mail-sender="mailSender"/>
 
-	<bean id="mailSender" class="org.springframework.batch.integration.samples.payments.StubJavaMailSender">
+	<bean id="mailSender"
+		  class="org.springframework.batch.integration.samples.payments.StubJavaMailSender">
 		<constructor-arg>
-			<bean class="javax.mail.internet.MimeMessage">
-				<constructor-arg type="javax.mail.Session"><null/></constructor-arg>
+			<bean class="jakarta.mail.internet.MimeMessage">
+				<constructor-arg type="jakarta.mail.Session">
+					<null/>
+				</constructor-arg>
 			</bean>
 		</constructor-arg>
 	</bean>
@@ -98,16 +100,5 @@
 	</int:channel>
 
 	<int:service-activator input-channel="chunks" output-channel="chunksReplies" ref="chunkHandler" />
-
-	<bean id="chunkItemWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter">
-		<property name="messagingOperations" >
-			<bean class="org.springframework.integration.core.MessagingTemplate">
-				<property name="defaultChannel" ref="chunks"/>
-			</bean>
-		</property>
-		<property name="replyChannel" ref="chunksReplies" />
-		<property name="throttleLimit" value="5" />
-		<property name="maxWaitTimeouts" value="30000" />
-	</bean>
 
 </beans>

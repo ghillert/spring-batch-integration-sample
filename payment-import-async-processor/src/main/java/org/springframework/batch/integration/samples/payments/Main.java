@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.integration.samples.payments.config.CommonConfig;
 import org.springframework.batch.integration.samples.payments.util.SpringIntegrationUtils;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.SimpleMailMessage;
@@ -42,9 +43,8 @@ public final class Main {
 	 * Load the Spring Integration Application Context
 	 *
 	 * @param args - command line arguments
-	 * @throws InterruptedException
 	 */
-	public static void main(final String... args) throws InterruptedException {
+	public static void main(final String... args) {
 
 		final Scanner scanner = new Scanner(System.in);
 
@@ -62,7 +62,7 @@ public final class Main {
 		System.out.println("\t2. Use AsyncItemProcessor with Spring Integration");
 		System.out.print("Enter you choice: ");
 
-		final GenericXmlApplicationContext context = new GenericXmlApplicationContext();
+		final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
 		while (true) {
 			final String input = scanner.nextLine();
@@ -82,8 +82,7 @@ public final class Main {
 			}
 		}
 
-		context.load("classpath:META-INF/spring/batch-context.xml",
-					"classpath:META-INF/spring/integration-context.xml");
+		context.register(CommonConfig.class);
 		context.registerShutdownHook();
 		context.refresh();
 

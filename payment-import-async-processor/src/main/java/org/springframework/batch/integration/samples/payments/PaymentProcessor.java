@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,19 @@ package org.springframework.batch.integration.samples.payments;
 
 import java.math.BigDecimal;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.batch.integration.samples.payments.model.Payment;
 import org.springframework.batch.integration.samples.payments.service.BusinessService;
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 
+/**
+ * @author Gunnar Hillert
+ */
 public class PaymentProcessor implements ItemProcessor<Payment, Payment> {
 
-	private static final Logger LOGGER = Logger.getLogger(PaymentProcessor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentProcessor.class);
 
 	final BusinessService businessService;
 
@@ -35,7 +40,7 @@ public class PaymentProcessor implements ItemProcessor<Payment, Payment> {
 	@Override
 	public Payment process(Payment payment) throws Exception {
 
-		LOGGER.info("Processing " + payment.getDate());
+		LOGGER.info("Processing {}", payment.getDate());
 		payment.setAmount(BigDecimal.valueOf(9999));
 
 		return businessService.doSomethingEnterprisey(payment);

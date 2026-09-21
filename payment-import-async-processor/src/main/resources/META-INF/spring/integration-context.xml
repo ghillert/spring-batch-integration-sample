@@ -5,13 +5,11 @@
 	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
 	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
 		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<int:poller default="true" fixed-rate="10000"/>
 
@@ -37,13 +35,11 @@
 	<int:service-activator method="launch" input-channel="requests"
 		output-channel="statuses">
 		<bean class="org.springframework.batch.integration.launch.JobLaunchingMessageHandler">
-			<constructor-arg ref="jobLauncher"/>
+			<constructor-arg ref="jobOperator"/>
 		</bean>
 	</int:service-activator>
 
 	<int:channel id="jobExecutions"/>
-
-	<int:channel id="chunks"/>
 
 	<int:channel id="jobRestarts" />
 
@@ -58,15 +54,16 @@
 	<int:channel id="chunkExecutions"/>
 
 	<int:gateway id="notificationExecutionsListener"
-		service-interface="org.springframework.batch.core.JobExecutionListener"
-		default-request-channel="jobExecutions"/>
+		 service-interface="org.springframework.batch.core.listener.JobExecutionListener"
+		 default-request-channel="jobExecutions"
+		 proxy-default-methods="true"/>
 
 	<int:router id="executionsRouter" input-channel="jobExecutions">
 		<bean class="org.springframework.batch.integration.samples.payments.JobExecutionsRouter"/>
 	</int:router>
 
 	<int:chain input-channel="jobRestarts">
-		<int:delayer id="foo" default-delay="5000"/>
+		<int:delayer id="wait5sec" default-delay="5000"/>
 		<int:service-activator>
 			<bean class="org.springframework.batch.integration.samples.payments.JobRestart"/>
 		</int:service-activator>
@@ -81,39 +78,38 @@
 	<int-mail:outbound-channel-adapter id="notificationsSender"
 					channel="mailNotifications" mail-sender="mailSender"/>
 
-	<bean id="mailSender" class="org.springframework.batch.integration.samples.payments.StubJavaMailSender">
+	<bean id="mailSender"
+		  class="org.springframework.batch.integration.samples.payments.StubJavaMailSender">
 		<constructor-arg>
-			<bean class="javax.mail.internet.MimeMessage">
-				<constructor-arg type="javax.mail.Session"><null/></constructor-arg>
+			<bean class="jakarta.mail.internet.MimeMessage">
+				<constructor-arg type="jakarta.mail.Session">
+					<null/>
+				</constructor-arg>
 			</bean>
 		</constructor-arg>
 	</bean>
 
 	<int-stream:stdout-channel-adapter channel="chunkExecutions" auto-startup="true"/>
 
-	<int:service-activator input-channel="chunks">
-		<bean class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
-			<property name="chunkProcessor">
-				<bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
-					<property name="itemWriter">
-						<bean class="org.springframework.batch.integration.samples.payments.PaymentWriter">
-							<constructor-arg ref="dataSource"/>
-						</bean>
-					</property>
-					<property name="itemProcessor">
-						<bean class="org.springframework.batch.item.support.PassThroughItemProcessor"/>
-					</property>
-				</bean>
-			</property>
-		</bean>
-	</int:service-activator>
+	<beans profile="with-spring-integration">
+		<int:gateway id="itemProcessor"
+					 service-interface="org.springframework.batch.infrastructure.item.ItemProcessor"
+					 default-request-channel="sendItemChannel"
+					 default-reply-channel="processedItems"/>
 
-	<bean id="chunkItemWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter">
-		<property name="messagingOperations" >
-			<bean class="org.springframework.integration.core.MessagingTemplate">
-				<property name="defaultChannel" ref="chunks"/>
-			</bean>
-		</property>
-	</bean>
+		<int:channel id="sendItemChannel"/>
+		<int:channel id="processedItems"/>
 
+		<int:chain input-channel="sendItemChannel"
+				   output-channel="processedItems">
+			<int:service-activator
+					ref="businessService"
+					method="doSomethingEnterprisey"/>
+			<int:enricher>
+				<int:property
+						name="comment"
+						value="Processed by Spring Integration"/>
+			</int:enricher>
+		</int:chain>
+	</beans>
 </beans>

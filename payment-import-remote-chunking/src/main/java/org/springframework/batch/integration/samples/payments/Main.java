@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.springframework.batch.integration.samples.payments;
 import java.util.List;
 
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.integration.samples.payments.config.CommonConfig;
 import org.springframework.batch.integration.samples.payments.util.SpringIntegrationUtils;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.messaging.Message;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,7 +43,7 @@ public final class Main {
 	 * @param args - command line arguments
 	 * @throws InterruptedException
 	 */
-	public static void main(final String... args) throws InterruptedException {
+	public static void main(final String... args) {
 
 		System.out.println("\n========================================================="
 						+ "\n    Welcome to the Spring Batch Integration              "
@@ -54,9 +54,8 @@ public final class Main {
 						+ "\n                                                         "
 						+ "\n=========================================================" );
 
-		final AbstractApplicationContext context =
-				new ClassPathXmlApplicationContext("classpath:META-INF/spring/batch-context.xml",
-						"classpath:META-INF/spring/integration-context.xml");
+		final AnnotationConfigApplicationContext context =
+				new AnnotationConfigApplicationContext(CommonConfig.class);
 
 		context.registerShutdownHook();
 

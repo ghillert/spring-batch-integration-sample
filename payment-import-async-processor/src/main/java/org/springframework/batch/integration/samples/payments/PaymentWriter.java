@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.integration.samples.payments.model.Payment;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -32,7 +35,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
  */
 public class PaymentWriter implements ItemWriter<Payment> {
 
-	private static final Logger LOGGER = Logger.getLogger(PaymentWriter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentWriter.class);
 
 	private SimpleJdbcInsert paymentInsert;
 	private JdbcTemplate accountUpdate;
@@ -45,15 +48,15 @@ public class PaymentWriter implements ItemWriter<Payment> {
 	}
 
 	@Override
-	public void write(List<? extends Payment> payments) throws Exception {
+	public void write(Chunk<? extends Payment> payments) throws Exception {
 		for (Payment payment : payments) {
 			MapSqlParameterSource parameterSource = new MapSqlParameterSource();
 			parameterSource.addValue("RECIPIENT", payment.getDestinationAccountNo()).addValue("PAYEE", payment.getSourceAccountNo())
-					.addValue("AMOUNT", payment.getAmount()).addValue("DATE", payment.getDate());
+					.addValue("AMOUNT", payment.getAmount()).addValue("PAY_DATE", payment.getDate());
 			accountUpdate.update("UPDATE ACCOUNTS SET BALANCE = BALANCE + ? WHERE ID = ?", payment.getAmount(), payment.getDestinationAccountNo());
 			accountUpdate.update("UPDATE ACCOUNTS SET BALANCE = BALANCE - ? WHERE ID = ?", payment.getAmount(), payment.getSourceAccountNo());
 			paymentInsert.execute(parameterSource);
-			LOGGER.info("Executing step: " + payment);
+			LOGGER.info("Executing step: {}", payment);
 		}
 	}
 }

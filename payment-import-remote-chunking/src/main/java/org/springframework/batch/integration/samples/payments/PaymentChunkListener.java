@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,12 @@
  */
 package org.springframework.batch.integration.samples.payments;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.integration.samples.payments.model.Notification;
 import org.springframework.batch.integration.samples.payments.model.Payment;
-import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.infrastructure.item.file.FlatFileParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.support.MessageBuilder;
@@ -49,8 +47,5 @@ public class PaymentChunkListener extends ItemListenerSupport<Payment, Payment> 
 		chunkNotificationsChannel.send(MessageBuilder.withPayload(new Notification(ex.getMessage(),true)).build());
 	}
 
-	@Override
-	public void onWriteError(Exception ex, List<? extends Payment> item) {
-	}
 }
 

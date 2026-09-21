@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.expression.Expression;
-import org.springframework.integration.file.FileReadingMessageSource;
-import org.springframework.integration.file.FileWritingMessageHandler;
+import org.springframework.integration.file.inbound.FileReadingMessageSource;
+import org.springframework.integration.file.outbound.FileWritingMessageHandler;
 
 /**
  * Displays the names of the input and output directories.
@@ -49,7 +49,22 @@ public final class SpringIntegrationUtils {
 	 */
 	public static void displayDirectories(final ApplicationContext context) {
 
-		final File inDir = (File) new DirectFieldAccessor(context.getBean(FileReadingMessageSource.class)).getPropertyValue("directory");
+		final FileReadingMessageSource source =
+				context.getBean(FileReadingMessageSource.class);
+
+		final Expression directoryExpression =
+				(Expression) new DirectFieldAccessor(source)
+						.getPropertyValue("directoryExpression");
+
+		if (directoryExpression == null) {
+			throw new IllegalStateException("Input directory expression is not configured");
+		}
+
+		final File inDir = directoryExpression.getValue(File.class);
+
+		if (inDir == null) {
+			throw new IllegalStateException("Input directory expression resolved to null");
+		}
 
 		final Map<String, FileWritingMessageHandler> fileWritingMessageHandlers = context.getBeansOfType(FileWritingMessageHandler.class);
 

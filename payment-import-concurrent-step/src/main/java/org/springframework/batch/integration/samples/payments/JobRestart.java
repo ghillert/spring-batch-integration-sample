@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,12 @@
  */
 package org.springframework.batch.integration.samples.payments;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 
@@ -33,17 +30,17 @@ import org.springframework.integration.annotation.ServiceActivator;
  */
 public class JobRestart {
 
-	private static final Log logger = LogFactory.getLog(JobRestart.class);
+	private static final Logger LOGGER =
+			LoggerFactory.getLogger(JobRestart.class);
 
 	@Autowired
-	JobLauncher jobLauncher;
-
-	@Autowired
-	Job job;
+	private JobOperator jobOperator;
 
 	@ServiceActivator
-	public void restartIfPossible(JobExecution execution) throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException, JobExecutionAlreadyRunningException {
-		logger.info("Restarting job...");
-		jobLauncher.run(job, execution.getJobParameters());
+	public void restartIfPossible(JobExecution execution)
+			throws JobRestartException {
+
+		LOGGER.info("Restarting job execution {}", execution.getId());
+		jobOperator.restart(execution);
 	}
 }

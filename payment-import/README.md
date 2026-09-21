@@ -17,7 +17,7 @@ This sample uses **Spring Batch Integration** to more easily use *Spring Batch* 
 
 You can run the application by either
 
-* running the "Main" class from within STS (Right-click on Main class --> Run As --> Java Application)
+* running the "Main" class from within STS (Right-click on Main class → Run As → Java Application)
 * or from the command line:
 
 	$ mvn package
