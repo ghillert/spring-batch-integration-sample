@@ -24,7 +24,7 @@ stub mail sender; no SMTP server is required.
 ## Technology
 
 - Java 17 or later
-- Spring Boot 4.1.1 dependency management
+- Spring Boot 4.1.2 dependency management
 - Spring Batch 6
 - Spring Integration 7
 - Embedded HSQLDB
@@ -66,7 +66,7 @@ mvn -pl payment-import test
 
 ## Running the Samples
 
-Run the following commands from the project root.
+Run the following commands from the project root with Maven 3.9.0 or later.
 
 **Basic** payment import:
 
