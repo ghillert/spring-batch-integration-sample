@@ -1,7 +1,8 @@
 Spring Batch Integration Samples
 ================================
 
-[![Build Status](https://travis-ci.org/ghillert/spring-batch-integration-sample.svg)](https://travis-ci.org/ghillert/spring-batch-integration-sample)
+[![Maven CI](https://github.com/ghillert/spring-batch-integration-sample/actions/workflows/maven.yml/badge.svg?branch=main&event=push)](https://github.com/ghillert/spring-batch-integration-sample/actions/workflows/maven.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
 
 This project contains samples for the [Spring Batch Integration][] module.
 
