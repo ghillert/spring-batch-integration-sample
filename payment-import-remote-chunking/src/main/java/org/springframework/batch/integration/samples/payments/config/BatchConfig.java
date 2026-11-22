@@ -21,14 +21,13 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.listener.ItemReadListener;
 import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
 import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.integration.chunk.ChunkProcessorChunkRequestHandler;
-import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilder;
+import org.springframework.batch.integration.chunk.RemoteChunkingManagerBuilder;
 import org.springframework.batch.integration.samples.payments.PaymentChunkListener;
 import org.springframework.batch.integration.samples.payments.PaymentFieldSetMapper;
 import org.springframework.batch.integration.samples.payments.PaymentWriter;
@@ -40,7 +39,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.SubscribableChannel;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -97,22 +96,21 @@ public class BatchConfig {
 			FlatFileItemReader<Payment> itemReader,
 			PaymentChunkListener paymentChunkListener,
 			@Qualifier("chunks") MessageChannel requests,
-			@Qualifier("chunksReplies") PollableChannel replies) {
+			@Qualifier("chunksReplies") SubscribableChannel replies) {
 
 		MessagingTemplate messaging = new MessagingTemplate();
 		messaging.setDefaultChannel(requests);
 		messaging.setReceiveTimeout(1_000);
 
-		return new RemoteChunkingManagerStepBuilder<Payment, Payment>(
-				"loadPayments", jobRepository)
-				.chunk(1)
-				.transactionManager(transactionManager)
-				.reader(itemReader)
+		return new RemoteChunkingManagerBuilder("loadPayments", jobRepository)
 				.messagingTemplate(messaging)
 				.inputChannel(replies)
 				.throttleLimit(5)
 				.maxWaitTimeouts(30)
-				.listener((ItemReadListener<Payment>) paymentChunkListener)
+				.<Payment, Payment>chunk(1)
+				.transactionManager(transactionManager)
+				.reader(itemReader)
+				.listener(paymentChunkListener)
 				.build();
 	}
 

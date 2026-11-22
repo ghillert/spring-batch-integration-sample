@@ -95,9 +95,7 @@
 	<!-- REMOTE CHUNKING -->
 
 	<int:channel id="chunks"/>
-	<int:channel id="chunksReplies">
-		  <int:queue/>
-	</int:channel>
+	<int:channel id="chunksReplies"/>
 
 	<int:service-activator input-channel="chunks" output-channel="chunksReplies" ref="chunkHandler" />
 

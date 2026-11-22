@@ -24,7 +24,7 @@ stub mail sender; no SMTP server is required.
 ## Technology
 
 - Java 17 or later
-- Spring Boot 4.1.2 dependency management
+- Spring Boot 4.2.0 dependency management
 - Spring Batch 6
 - Spring Integration 7
 - Embedded HSQLDB
